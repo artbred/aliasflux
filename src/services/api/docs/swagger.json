@@ -1,0 +1,82 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "title": "AliasFlux API",
+        "contact": {},
+        "version": "1.0"
+    },
+    "basePath": "/api/v1",
+    "paths": {
+        "/chats/create": {
+            "post": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "chats"
+                ],
+                "summary": "Create chat",
+                "parameters": [
+                    {
+                        "description": "Chat",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/chats.CreateChatRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/chats.CreateChatResponse"
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "chats.CreateChatRequest": {
+            "type": "object",
+            "required": [
+                "chat_config"
+            ],
+            "properties": {
+                "chat_config": {
+                    "$ref": "#/definitions/flux.Config"
+                }
+            }
+        },
+        "chats.CreateChatResponse": {
+            "type": "object",
+            "properties": {
+                "chat_id": {
+                    "type": "string"
+                },
+                "message": {
+                    "type": "string"
+                },
+                "ok": {
+                    "type": "boolean"
+                }
+            }
+        },
+        "flux.Config": {
+            "type": "object",
+            "required": [
+                "platform_name"
+            ],
+            "properties": {
+                "platform_name": {
+                    "type": "string"
+                }
+            }
+        }
+    }
+}

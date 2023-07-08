@@ -1,0 +1,52 @@
+basePath: /api/v1
+definitions:
+  chats.CreateChatRequest:
+    properties:
+      chat_config:
+        $ref: '#/definitions/flux.Config'
+    required:
+    - chat_config
+    type: object
+  chats.CreateChatResponse:
+    properties:
+      chat_id:
+        type: string
+      message:
+        type: string
+      ok:
+        type: boolean
+    type: object
+  flux.Config:
+    properties:
+      platform_name:
+        type: string
+    required:
+    - platform_name
+    type: object
+info:
+  contact: {}
+  title: AliasFlux API
+  version: "1.0"
+paths:
+  /chats/create:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Chat
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/chats.CreateChatRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/chats.CreateChatResponse'
+      summary: Create chat
+      tags:
+      - chats
+swagger: "2.0"
