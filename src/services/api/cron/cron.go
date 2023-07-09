@@ -1,7 +1,6 @@
 package cron
 
 import (
-	"github.com/artbred/aliasflux/src/pkg/common"
 	"github.com/artbred/aliasflux/src/services/api/cron/jobs"
 	"github.com/robfig/cron/v3"
 	"time"
@@ -20,15 +19,11 @@ func Start() {
 	)
 
 	jobCache := jobs.NewCacheJob()
+	_, _ = c.AddJob("@every 1m", jobCache)
 
-	_, err := c.AddJob("@every 1m", cron.NewChain(
-		cron.SkipIfStillRunning(cron.DefaultLogger),
-	).Then(jobCache))
+	jobTld := jobs.NewTldJob()
+	_, _ = c.AddJob("@every 24h", jobTld)
 
-	if err != nil {
-		common.Logger.WithError(err).Error("error adding job")
-	}
-
-	runStartUpJobs(jobCache)
+	runStartUpJobs(jobCache, jobTld)
 	c.Start()
 }

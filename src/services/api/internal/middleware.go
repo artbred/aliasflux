@@ -54,7 +54,7 @@ func SetupMiddleware(e *echo.Echo) {
 	if !config.Debug {
 		corsConfig = middleware.CORSConfig{
 			Skipper:          middleware.DefaultSkipper,
-			AllowOrigins:     []string{fmt.Sprintf("https://%s", config.Domain), fmt.Sprintf("https://www.%s", config.Domain)},
+			AllowOrigins:     []string{fmt.Sprintf("https://%s", config.FrontDomain), fmt.Sprintf("https://www.%s", config.FrontDomain)},
 			AllowMethods:     []string{echo.GET, echo.HEAD, echo.PUT, echo.PATCH, echo.POST, echo.DELETE, echo.OPTIONS},
 			AllowHeaders:     []string{"*"},
 			AllowCredentials: true,

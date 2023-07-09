@@ -40,10 +40,90 @@ const docTemplate = `{
                     }
                 ],
                 "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/chats.CreateChatResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/chats/settings": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "chats"
+                ],
+                "summary": "Get available chat configurations",
+                "responses": {
                     "200": {
                         "description": "OK",
                         "schema": {
                             "$ref": "#/definitions/chats.CreateChatResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/chats/{id}": {
+            "get": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "chats"
+                ],
+                "summary": "Get chat",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Chat ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Offset",
+                        "name": "offset",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/chats.CreateChatResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/users/create": {
+            "get": {
+                "description": "Create user",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "users"
+                ],
+                "summary": "Create user",
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/users.CreateUserResponse"
                         }
                     }
                 }
@@ -54,11 +134,15 @@ const docTemplate = `{
         "chats.CreateChatRequest": {
             "type": "object",
             "required": [
-                "chat_config"
+                "settings",
+                "user_id"
             ],
             "properties": {
-                "chat_config": {
-                    "$ref": "#/definitions/flux.Config"
+                "settings": {
+                    "$ref": "#/definitions/flux.Settings"
+                },
+                "user_id": {
+                    "type": "string"
                 }
             }
         },
@@ -73,16 +157,74 @@ const docTemplate = `{
                 },
                 "ok": {
                     "type": "boolean"
+                },
+                "payment_link": {
+                    "type": "string"
                 }
             }
         },
-        "flux.Config": {
+        "flux.Platform": {
+            "type": "string",
+            "enum": [
+                "domain"
+            ],
+            "x-enum-varnames": [
+                "PlatformDomain"
+            ]
+        },
+        "flux.Settings": {
             "type": "object",
             "required": [
-                "platform_name"
+                "platform"
             ],
             "properties": {
-                "platform_name": {
+                "max_length": {
+                    "type": "integer"
+                },
+                "platform": {
+                    "maxLength": 10,
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/flux.Platform"
+                        }
+                    ]
+                },
+                "preferred_names": {
+                    "type": "array",
+                    "maxItems": 50,
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "tld": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/flux.TldSettings"
+                    }
+                }
+            }
+        },
+        "flux.TldSettings": {
+            "type": "object",
+            "properties": {
+                "name": {
+                    "type": "string"
+                },
+                "type": {
+                    "type": "string"
+                }
+            }
+        },
+        "users.CreateUserResponse": {
+            "type": "object",
+            "properties": {
+                "message": {
+                    "type": "string"
+                },
+                "ok": {
+                    "type": "boolean"
+                },
+                "user_id": {
                     "type": "string"
                 }
             }

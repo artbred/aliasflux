@@ -19,17 +19,11 @@ func InternalServerErrorResponse(c echo.Context) error {
 
 func ValidateRequest(c echo.Context, req interface{}) error {
 	if err := c.Bind(req); err != nil {
-		return c.JSON(http.StatusBadRequest, BaseResponse{
-			Ok:      false,
-			Message: err.Error(),
-		})
+		return err
 	}
 
 	if err := c.Validate(req); err != nil {
-		return c.JSON(http.StatusBadRequest, BaseResponse{
-			Ok:      false,
-			Message: err.Error(),
-		})
+		return err
 	}
 
 	return nil

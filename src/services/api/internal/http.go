@@ -20,14 +20,16 @@ func Setup(e *echo.Echo) {
 }
 
 func ServerHttp(e *echo.Echo) {
+	addr := ":" + config.ApiPort
+
 	if config.Debug {
-		err := e.Start(":" + config.ApiPort)
+		err := e.Start(addr)
 		if err != nil {
 			common.Logger.Fatal(err)
 		}
 	} else {
 		go func() {
-			if err := e.Start(":" + config.ApiPort); err != nil && err != http.ErrServerClosed {
+			if err := e.Start(addr); err != nil && err != http.ErrServerClosed {
 				common.Logger.Fatal("shutting down the server")
 			}
 		}()

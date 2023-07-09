@@ -10,7 +10,7 @@ import (
 var (
 	EndpointErrors = promauto.NewCounterVec(prometheus.CounterOpts{
 		Name: "api_endpoint_errors_total",
-		Help: "Total number of failure responses from api",
+		Help: "Total number of failure support from api",
 	}, []string{"endpoint", "method", "status_code"})
 )
 

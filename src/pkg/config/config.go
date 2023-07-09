@@ -9,9 +9,11 @@ import (
 var (
 	Debug bool
 
-	ApiPort string
+	ApiPort     string
+	FrontDomain string
 
-	Domain string
+	GoDaddyApiKey    string
+	GoDaddyApiSecret string
 )
 
 func init() {
@@ -20,7 +22,10 @@ func init() {
 	}
 
 	ApiPort = os.Getenv("API_PORT")
-	Domain = os.Getenv("DOMAIN")
+	FrontDomain = os.Getenv("DOMAIN")
 
 	Debug, _ = strconv.ParseBool(os.Getenv("DEBUG"))
+
+	GoDaddyApiKey = os.Getenv("GODADDY_API_KEY")
+	GoDaddyApiSecret = os.Getenv("GODADDY_API_SECRET")
 }

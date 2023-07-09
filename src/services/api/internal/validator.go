@@ -19,7 +19,10 @@ func (cv *CustomValidator) Validate(i interface{}) error {
 
 			field, ok := reflect.TypeOf(i).Elem().FieldByName(alias)
 			if ok {
-				alias = field.Tag.Get("alias")
+				fieldName := field.Tag.Get("alias")
+				if fieldName != "" {
+					alias = fieldName
+				}
 			}
 
 			switch err.Tag() {

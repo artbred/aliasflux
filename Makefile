@@ -20,7 +20,7 @@ flush_db:
 	docker-compose stop postgres; \
 	rm -rf data/postgres || true; \
 	docker-compose  up -d postgres; \
-	until pg_isready -h localhost -p ${POSTGRES_LOCAL_PORT}; do sleep 1; done; \
+	until pg_isready -h localhost -p ${POSTGRES_PORT}; do sleep 1; done; \
 
 
 .PHONY: fresh_db

@@ -2,10 +2,13 @@ basePath: /api/v1
 definitions:
   chats.CreateChatRequest:
     properties:
-      chat_config:
-        $ref: '#/definitions/flux.Config'
+      settings:
+        $ref: '#/definitions/flux.Settings'
+      user_id:
+        type: string
     required:
-    - chat_config
+    - settings
+    - user_id
     type: object
   chats.CreateChatResponse:
     properties:
@@ -15,19 +18,81 @@ definitions:
         type: string
       ok:
         type: boolean
-    type: object
-  flux.Config:
-    properties:
-      platform_name:
+      payment_link:
         type: string
+    type: object
+  flux.Platform:
+    enum:
+    - domain
+    type: string
+    x-enum-varnames:
+    - PlatformDomain
+  flux.Settings:
+    properties:
+      max_length:
+        type: integer
+      platform:
+        allOf:
+        - $ref: '#/definitions/flux.Platform'
+        maxLength: 10
+      preferred_names:
+        items:
+          type: string
+        maxItems: 50
+        type: array
+      tld:
+        items:
+          $ref: '#/definitions/flux.TldSettings'
+        type: array
     required:
-    - platform_name
+    - platform
+    type: object
+  flux.TldSettings:
+    properties:
+      name:
+        type: string
+      type:
+        type: string
+    type: object
+  users.CreateUserResponse:
+    properties:
+      message:
+        type: string
+      ok:
+        type: boolean
+      user_id:
+        type: string
     type: object
 info:
   contact: {}
   title: AliasFlux API
   version: "1.0"
 paths:
+  /chats/{id}:
+    get:
+      consumes:
+      - application/json
+      parameters:
+      - description: Chat ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Offset
+        in: query
+        name: offset
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/chats.CreateChatResponse'
+      summary: Get chat
+      tags:
+      - chats
   /chats/create:
     post:
       consumes:
@@ -42,11 +107,38 @@ paths:
       produces:
       - application/json
       responses:
-        "200":
-          description: OK
+        "201":
+          description: Created
           schema:
             $ref: '#/definitions/chats.CreateChatResponse'
       summary: Create chat
       tags:
       - chats
+  /chats/settings:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/chats.CreateChatResponse'
+      summary: Get available chat configurations
+      tags:
+      - chats
+  /users/create:
+    get:
+      consumes:
+      - application/json
+      description: Create user
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/users.CreateUserResponse'
+      summary: Create user
+      tags:
+      - users
 swagger: "2.0"
