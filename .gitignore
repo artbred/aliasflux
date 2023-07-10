@@ -26,3 +26,7 @@ report.html
 report.json
 
 data
+.idea
+.venv
+.vscode
+service_account.json

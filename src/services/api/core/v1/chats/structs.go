@@ -1,14 +1,13 @@
 package chats
 
 import (
-	"github.com/artbred/aliasflux/src/domain/flux"
 	"github.com/artbred/aliasflux/src/domain/models"
 	"github.com/artbred/aliasflux/src/services/api/internal"
 )
 
 type CreateChatRequest struct {
-	UserID       string        `json:"user_id"  validate:"required,uuid"`
-	ChatSettings flux.Settings `json:"settings" validate:"required"`
+	UserID       string              `json:"user_id"  validate:"required,uuid"`
+	ChatSettings models.SettingsUser `json:"settings" validate:"required"`
 }
 
 type CreateChatResponse struct {
@@ -34,5 +33,5 @@ type WebsocketConnectRequest struct {
 
 type ListChatConfigurationsResponse struct {
 	internal.BaseResponse
-	Configurations []models.ChatSettings `json:"configurations"`
+	Configurations []models.PlatformSettings `json:"configurations"`
 }

@@ -20,8 +20,8 @@ func (r *Router) Init(g *echo.Group) {
 
 	g.GET("/:id", r.GetChatHandler)
 	g.POST("/create", r.CreateChatHandler)
+	g.GET("/platforms", r.ListPlatformsHandler)
 	g.GET("/ws", r.WebsocketHandler)
-	g.GET("/settings", r.ListAvailableChatSettingsHandler)
 }
 
 func NewRouter() *Router {

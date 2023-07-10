@@ -5,20 +5,19 @@ import (
 	"database/sql"
 	"encoding/json"
 	"fmt"
-	"github.com/artbred/aliasflux/src/domain/flux"
 	"github.com/artbred/aliasflux/src/pkg/storages/postgres"
 	"reflect"
 )
 
 type Settings struct {
-	ID       int            `db:"id" json:"-"`
-	Platform *flux.Platform `db:"platform" json:"platform"`
-	Key      string         `db:"key" json:"key"`
-	Value    string         `db:"value" json:"value"`
+	ID       int       `db:"id" json:"-"`
+	Platform *Platform `db:"platform" json:"platform"`
+	Key      string    `db:"key" json:"key"`
+	Value    string    `db:"value" json:"value"`
 }
 
-type ChatSettings struct {
-	Platform flux.Platform   `db:"platform" json:"platform"`
+type PlatformSettings struct {
+	Platform Platform        `db:"platform" json:"platform"`
 	Settings json.RawMessage `db:"settings" json:"settings"`
 }
 
@@ -33,7 +32,7 @@ func GetAllSettings() (settings []Settings, err error) {
 	return
 }
 
-func ValidateSettings(ctx context.Context, settings flux.Settings) (validationErr, err error) {
+func ValidateSettings(ctx context.Context, settings SettingsUser) (validationErr, err error) {
 	t := reflect.TypeOf(settings)
 	v := reflect.ValueOf(settings)
 
@@ -41,10 +40,10 @@ func ValidateSettings(ctx context.Context, settings flux.Settings) (validationEr
 
 	for i := 0; i < t.NumField(); i++ {
 		field := t.Field(i)
-		settingKey := field.Tag.Get("settings")
+		settingsKey := field.Tag.Get("settings")
 
-		if len(settingKey) > 0 {
-			settingsMap[settingKey] = v.Field(i).Interface()
+		if len(settingsKey) > 0 {
+			settingsMap[settingsKey] = v.Field(i).Interface()
 		}
 	}
 
@@ -60,18 +59,18 @@ func ValidateSettings(ctx context.Context, settings flux.Settings) (validationEr
 		}
 
 		if !isValid {
-			return fmt.Errorf("You provider invalid value for %s settings", key), nil
+			return fmt.Errorf("You provided invalid values for %s settings", key), nil
 		}
 	}
 
 	return nil, nil
 }
 
-func GetFreeChatFeatures(ctx context.Context) (features *flux.FreeChatFeatures, err error) {
+func GetFreeChatFeatures(ctx context.Context) (features *ChatFeatures, err error) {
 	conn := postgres.Connection()
-	var val []byte
+	features = &ChatFeatures{}
 
-	err = conn.GetContext(ctx, &val, "SELECT value FROM settings WHERE key=$1;", flux.SettingKeyFreeChatFeatures)
+	err = conn.GetContext(ctx, features, "SELECT value FROM settings WHERE key=$1;", SettingKeyFreeChatFeatures)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			return nil, nil
@@ -79,13 +78,10 @@ func GetFreeChatFeatures(ctx context.Context) (features *flux.FreeChatFeatures, 
 		err = fmt.Errorf("can't get free chat features: %v", err)
 	}
 
-	features = &flux.FreeChatFeatures{}
-	err = json.Unmarshal(val, features)
-
 	return
 }
 
-func ListAvailableChatSettings(ctx context.Context) (settings []ChatSettings, err error) {
+func ListAvailablePlatformSettings(ctx context.Context) (settings []PlatformSettings, err error) {
 	conn := postgres.Connection()
 
 	query := `

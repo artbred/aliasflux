@@ -39,6 +39,7 @@ services:
     nats:
         container_name: nats
         image: nats:latest
+        command: ["-p", "${NATS_PORT}"]
         labels:
             - "container_tag=nats"
         ports:

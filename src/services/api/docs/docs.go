@@ -49,7 +49,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/chats/settings": {
+        "/chats/platforms": {
             "get": {
                 "produces": [
                     "application/json"
@@ -139,7 +139,7 @@ const docTemplate = `{
             ],
             "properties": {
                 "settings": {
-                    "$ref": "#/definitions/flux.Settings"
+                    "$ref": "#/definitions/models.SettingsUser"
                 },
                 "user_id": {
                     "type": "string"
@@ -163,7 +163,7 @@ const docTemplate = `{
                 }
             }
         },
-        "flux.Platform": {
+        "models.Platform": {
             "type": "string",
             "enum": [
                 "domain"
@@ -172,7 +172,7 @@ const docTemplate = `{
                 "PlatformDomain"
             ]
         },
-        "flux.Settings": {
+        "models.SettingsUser": {
             "type": "object",
             "required": [
                 "platform"
@@ -185,7 +185,7 @@ const docTemplate = `{
                     "maxLength": 10,
                     "allOf": [
                         {
-                            "$ref": "#/definitions/flux.Platform"
+                            "$ref": "#/definitions/models.Platform"
                         }
                     ]
                 },
@@ -199,12 +199,12 @@ const docTemplate = `{
                 "tld": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/flux.TldSettings"
+                        "$ref": "#/definitions/models.TldSettings"
                     }
                 }
             }
         },
-        "flux.TldSettings": {
+        "models.TldSettings": {
             "type": "object",
             "properties": {
                 "name": {

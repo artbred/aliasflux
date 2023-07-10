@@ -14,7 +14,7 @@ $do$
 
         _key := 'free_chat_features';
         _value := '{
-            "messages_limit": 2
+            "messages_limit": 100
         }'::jsonb;
 
         if not exists (select 1 from settings where key = _key) then

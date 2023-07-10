@@ -3,7 +3,7 @@ definitions:
   chats.CreateChatRequest:
     properties:
       settings:
-        $ref: '#/definitions/flux.Settings'
+        $ref: '#/definitions/models.SettingsUser'
       user_id:
         type: string
     required:
@@ -21,19 +21,19 @@ definitions:
       payment_link:
         type: string
     type: object
-  flux.Platform:
+  models.Platform:
     enum:
     - domain
     type: string
     x-enum-varnames:
     - PlatformDomain
-  flux.Settings:
+  models.SettingsUser:
     properties:
       max_length:
         type: integer
       platform:
         allOf:
-        - $ref: '#/definitions/flux.Platform'
+        - $ref: '#/definitions/models.Platform'
         maxLength: 10
       preferred_names:
         items:
@@ -42,12 +42,12 @@ definitions:
         type: array
       tld:
         items:
-          $ref: '#/definitions/flux.TldSettings'
+          $ref: '#/definitions/models.TldSettings'
         type: array
     required:
     - platform
     type: object
-  flux.TldSettings:
+  models.TldSettings:
     properties:
       name:
         type: string
@@ -114,7 +114,7 @@ paths:
       summary: Create chat
       tags:
       - chats
-  /chats/settings:
+  /chats/platforms:
     get:
       produces:
       - application/json

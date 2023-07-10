@@ -1,7 +1,7 @@
 package jobs
 
 import (
-	"github.com/artbred/aliasflux/src/domain/flux"
+	"github.com/artbred/aliasflux/src/domain/models"
 	"github.com/artbred/aliasflux/src/domain/providers/godaddy"
 	"github.com/artbred/aliasflux/src/pkg/common"
 	"github.com/artbred/aliasflux/src/pkg/storages/postgres"
@@ -24,7 +24,7 @@ func (j *TldJob) Run() {
 		VALUES ($1, $2, $3::jsonb)
 		ON CONFLICT (platform, key) DO UPDATE SET value = $3::jsonb`
 
-	_, err = conn.Exec(query, flux.PlatformDomain, flux.SettingTld, tldsGo)
+	_, err = conn.Exec(query, models.PlatformDomain, models.SettingTld, tldsGo)
 	if err != nil {
 		j.logger.WithError(err).Error("failed to insert tlds")
 		return

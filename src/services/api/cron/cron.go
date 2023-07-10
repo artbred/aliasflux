@@ -24,6 +24,6 @@ func Start() {
 	jobTld := jobs.NewTldJob()
 	_, _ = c.AddJob("@every 24h", jobTld)
 
-	runStartUpJobs(jobCache, jobTld)
+	runStartUpJobs(jobs.NewRedisJob(), jobCache, jobTld)
 	c.Start()
 }
