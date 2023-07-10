@@ -6,7 +6,6 @@ from google.oauth2 import service_account
 from langchain.chat_models import ChatVertexAI
 from langchain.prompts import ChatPromptTemplate
 from langchain.schema.messages import HumanMessage, AIMessage
-from langchain.chat_models
 
 with open("service_account.json", encoding="utf-8") as f:
     service_account_info = json.load(f)

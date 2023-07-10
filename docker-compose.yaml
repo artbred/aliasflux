@@ -24,10 +24,24 @@ services:
             - redis
             - nats
 
+    zion:
+        <<: *base
+        restart: on-failure
+        container_name: zion
+        build:
+            context: .
+            dockerfile: src/services/zion/Dockerfile
+        labels:
+            - "container_tag=api"
+        depends_on:
+            - postgres
+            - redis
+            - nats
+
     redis:
         container_name: redis
         image: redis
-        command: ["redis-server", "--appendonly", "yes", "--aof-use-rdb-preamble", "yes", "--port", "${REDIS_PORT}"]
+        command: ["redis-server", "--appendonly", "yes", "--aof-use-rdb-preamble", "yes"]
         restart: always
         labels:
             - "container_tag=redis"
@@ -48,119 +62,120 @@ services:
             - "./data/nats-storage:/etc/nats-server"
             - "./data/nats-logs:/var/log/nats-server"
 
-    nginx-proxy:
-        container_name: nginx-proxy
-        image: jwilder/nginx-proxy
-        labels:
-            - "container_tag=nginx-proxy"
-        ports:
-            - "80:80"
-            - "443:443"
-        environment:
-            - ENABLE_IPV6=true
-        volumes:
-            - /var/run/docker.sock:/tmp/docker.sock:ro
-            - ./data/nginx:/etc/nginx/conf.d
-            - ./data/nginx:/etc/nginx/vhost.d
-            - ./infrastructure/nginx:/etc/nginx/certs
-        depends_on:
-            - api
-            - grafana
+#    nginx-proxy:
+#        container_name: nginx-proxy
+#        image: jwilder/nginx-proxy
+#        labels:
+#            - "container_tag=nginx-proxy"
+#        ports:
+#            - "80:80"
+#            - "443:443"
+#        environment:
+#            - ENABLE_IPV6=true
+#        volumes:
+#            - /var/run/docker.sock:/tmp/docker.sock:ro
+#            - ./data/nginx:/etc/nginx/conf.d
+#            - ./data/nginx:/etc/nginx/vhost.d
+#            - ./infrastructure/nginx:/etc/nginx/certs
+#        depends_on:
+#            - api
+#            - grafana
 
     postgres:
         <<: *base
         image: postgres:15
         hostname: postgres
         restart: always
-        command: -p ${POSTGRES_PORT}
+        environment:
+            - port=${POSTGRES_PORT}
         ports:
             - 127.0.0.1:${POSTGRES_PORT}:${POSTGRES_PORT}
         volumes:
             - ./data/postgres:/var/lib/postgresql/data
 
     ####################### MONITORING #######################
-    prometheus:
-        container_name: prometheus
-        restart: always
-        image: prom/prometheus:latest
-        user: root
-        labels:
-            - "container_tag=prometheus"
-        volumes:
-            - ./infrastructure/monitoring/prometheus.yaml:/etc/prometheus/prometheus.yml
-            - ./data/prometheus:/prometheus
-        command:
-            - '--config.file=/etc/prometheus/prometheus.yml'
-            - '--storage.tsdb.path=/prometheus'
-            - '--storage.tsdb.retention.time=90d'
-        ports:
-            - 127.0.0.1:${PROMETHEUS_PORT}:9090
-        logging:
-            driver: "json-file"
-            options:
-                max-size: "1g"
-        depends_on:
-            - api
-            - node-exporter
-            - cadvisor
-
-    grafana:
-        restart: always
-        image: grafana/grafana
-        container_name: grafana
-        user: root
-        labels:
-            - "container_tag=grafana"
-        volumes:
-            - ./data/grafana:/var/lib/grafana
-        environment:
-            - VIRTUAL_HOST=grafana.${DOMAIN}
-            - VIRTUAL_PORT=3000
-        ports:
-            - 127.0.0.1:${GRAFANA_PORT}:3000
-        logging:
-            driver: "json-file"
-            options:
-                max-size: "1g"
-        depends_on:
-            - prometheus
-
-    node-exporter:
-        image: prom/node-exporter:latest
-        container_name: node-exporter
-        restart: unless-stopped
-        labels:
-            - "container_tag=node-exporter"
-        volumes:
-            - /proc:/host/proc:ro
-            - /sys:/host/sys:ro
-            - /:/rootfs:ro
-        logging:
-            driver: "json-file"
-            options:
-                max-size: "1g"
-        command:
-            - '--path.procfs=/host/proc'
-            - '--path.sysfs=/host/sys'
-            - '--path.rootfs=/rootfs'
-            - '--collector.filesystem.ignored-mount-points=^/(sys|proc|dev|host|etc)($$|/)'
-            - '--collector.processes'
-
-    cadvisor:
-        image: gcr.io/cadvisor/cadvisor:v0.47.0
-        container_name: cadvisor
-        privileged: true
-        labels:
-            - "container_tag=cadvisor"
-        volumes:
-            - /:/rootfs:ro
-            - /var/run:/var/run:ro
-            - /sys:/sys:ro
-            - /var/lib/docker/:/var/lib/docker:ro
-            - /dev/disk/:/dev/disk:ro
-        logging:
-            driver: "json-file"
-            options:
-                max-size: "1g"
-        ports:
-            - 127.0.0.1:${CADVISOR_LOCAL_PORT}:8080
+#    prometheus:
+#        container_name: prometheus
+#        restart: always
+#        image: prom/prometheus:latest
+#        user: root
+#        labels:
+#            - "container_tag=prometheus"
+#        volumes:
+#            - ./infrastructure/monitoring/prometheus.yaml:/etc/prometheus/prometheus.yml
+#            - ./data/prometheus:/prometheus
+#        command:
+#            - '--config.file=/etc/prometheus/prometheus.yml'
+#            - '--storage.tsdb.path=/prometheus'
+#            - '--storage.tsdb.retention.time=90d'
+#        ports:
+#            - 127.0.0.1:${PROMETHEUS_PORT}:9090
+#        logging:
+#            driver: "json-file"
+#            options:
+#                max-size: "1g"
+#        depends_on:
+#            - api
+#            - node-exporter
+#            - cadvisor
+#
+#    grafana:
+#        restart: always
+#        image: grafana/grafana
+#        container_name: grafana
+#        user: root
+#        labels:
+#            - "container_tag=grafana"
+#        volumes:
+#            - ./data/grafana:/var/lib/grafana
+#        environment:
+#            - VIRTUAL_HOST=grafana.${DOMAIN}
+#            - VIRTUAL_PORT=3000
+#        ports:
+#            - 127.0.0.1:${GRAFANA_PORT}:3000
+#        logging:
+#            driver: "json-file"
+#            options:
+#                max-size: "1g"
+#        depends_on:
+#            - prometheus
+#
+#    node-exporter:
+#        image: prom/node-exporter:latest
+#        container_name: node-exporter
+#        restart: unless-stopped
+#        labels:
+#            - "container_tag=node-exporter"
+#        volumes:
+#            - /proc:/host/proc:ro
+#            - /sys:/host/sys:ro
+#            - /:/rootfs:ro
+#        logging:
+#            driver: "json-file"
+#            options:
+#                max-size: "1g"
+#        command:
+#            - '--path.procfs=/host/proc'
+#            - '--path.sysfs=/host/sys'
+#            - '--path.rootfs=/rootfs'
+#            - '--collector.filesystem.ignored-mount-points=^/(sys|proc|dev|host|etc)($$|/)'
+#            - '--collector.processes'
+#
+#    cadvisor:
+#        image: gcr.io/cadvisor/cadvisor:v0.47.0
+#        container_name: cadvisor
+#        privileged: true
+#        labels:
+#            - "container_tag=cadvisor"
+#        volumes:
+#            - /:/rootfs:ro
+#            - /var/run:/var/run:ro
+#            - /sys:/sys:ro
+#            - /var/lib/docker/:/var/lib/docker:ro
+#            - /dev/disk/:/dev/disk:ro
+#        logging:
+#            driver: "json-file"
+#            options:
+#                max-size: "1g"
+#        ports:
+#            - 127.0.0.1:${CADVISOR_LOCAL_PORT}:8080

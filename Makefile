@@ -13,6 +13,7 @@ migrate_db:
 flyway:
 	flyway -user=${POSTGRES_USER} -password=${POSTGRES_PASSWORD} -url=jdbc:${JDBC_URL} -locations=filesystem:sql -outputFile=/dev/null $(COMMAND)
 
+
 .PHONY: flush_db
 flush_db:
 	echo "This command cleans up the whole database. Press ENTER if you are sure you are not on production, else press Ctrl+C"; \
@@ -38,9 +39,10 @@ up:
 ifeq ($(DEBUG), true)
 	@docker-compose up -d redis postgres nats
 else
+	@migrate_db
+	@rebuild
 	@docker-compose up -d
 endif
-
 
 docs:
 	cd src/services/api && swag init --parseDependency --parseInternal
